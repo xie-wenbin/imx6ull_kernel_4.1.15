@@ -1,0 +1,39 @@
+# Linux kernel targets for imx6ull 
+
+linux:
+	@echo ===================================
+	@echo    Building Linux Kernel
+	@echo ===================================
+	$(MAKE) -C $(LINUXKERNEL_SRC_DIR) ARCH=arm CROSS_COMPILE=$(CROSS_COMPILE) $(LINUX_MACHINE) \
+		O=$(LINUX_KERNEL_BUILD)
+	$(MAKE) -C $(LINUXKERNEL_SRC_DIR) ARCH=arm CROSS_COMPILE=$(CROSS_COMPILE) \
+		O=$(LINUX_KERNEL_BUILD) all -j4
+
+linux_menuconfig:
+	@echo ===================================
+	@echo    Building Linux Kernel menuconfig for $(ARMV7)
+	@echo ===================================
+	$(MAKE) -C $(LINUXKERNEL_SRC_DIR) \
+		ARCH=arm CROSS_COMPILE=$(CROSS_COMPILE) $(LINUX_MACHINE) \
+		O=$(LINUX_KERNEL_BUILD)
+	$(MAKE) -C $(LINUXKERNEL_SRC_DIR) \
+		ARCH=arm CROSS_COMPILE=$(CROSS_COMPILE) menuconfig\
+		O=$(LINUX_KERNEL_BUILD)
+	$(MAKE) -C $(LINUXKERNEL_SRC_DIR) \
+		ARCH=arm CROSS_COMPILE=$(CROSS_COMPILE) \
+		O=$(LINUX_KERNEL_BUILD) all
+
+linux_clean:
+	@echo ===================================
+	@echo    Cleaning the Linux Kernel
+	@echo ===================================
+	$(MAKE) -C $(LINUXKERNEL_SRC_DIR) CROSS_COMPILE=$(CROSS_COMPILE) distclean
+	rm -rf $(LINUXKERNEL_SRC_DIR)/$(LINUX_KERNEL_BUILD)
+
+linux_install:
+	@echo ===================================
+	@echo    copy the Linux Kernel and dtbs
+	@echo ===================================
+	mkdir -p $(PROJ_BINARY_OUT)
+	cp $(LINUXKERNEL_SRC_DIR)/$(LINUX_KERNEL_BUILD)/arch/arm/boot/zImage $(PROJ_BINARY_OUT)/
+	cp $(LINUXKERNEL_SRC_DIR)/$(LINUX_KERNEL_BUILD)/arch/arm/boot/dts/imx6ull-alpha-emmc.dtb $(PROJ_BINARY_OUT)/
